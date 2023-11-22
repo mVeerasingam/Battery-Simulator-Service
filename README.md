@@ -8,7 +8,7 @@ Achieved by recieving and updating the payload from the [Java Job Manager](https
 before sending out a post request to Job Manager when the simulation is complete.
 The application should handle multiple simulation requests concurrently without blocking.
 
-[PyBaMM](https://github.com/pybamm-team/), "Python Battery Mathematical Model," is an open-source Python library designed for modeling and simulating the behavior of batteries. It provides a framework for implementing physics-based models and numerical methods to analyze various aspects of battery performance. 
+[PyBaMM](https://github.com/pybamm-team/)(Python Battery Mathematical Model) is developed by Ionworks, The Faraday Institution and NumFocus. Partnering with universities like Oxford and University of Michigan, both recognised leaders in Battery Technology R&D. PyBaMM is an mathematical simulation framework that offers a platform for formulating and solving differential equations related to electrochemical behaviours of batteris a library of battery models, parameters, and tools for simulating battery experiments and visualizing results. https://pybamm.org/
 
 ### Current Features:
 -   Currently, genereates a single cell Lithium Ion Battery Model, based off a LGM50 Cell's electrochemical properties.
