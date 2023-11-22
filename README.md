@@ -1,7 +1,7 @@
-# Battery-Simulator-Microservice 🔋
+# Battery-Simulator-Microservice 🔋💥
 ## Authors: Mark Veerasingam and Lucas Jeanes
 ### Description: 
-ATU 3rd Year CICD 1 
+ATU 3rd Year CICD 1 Project
 
 A flask based microservice that simulates Lithium-Ion Battery models with PyBaMM. 
 Achieved by recieving and updating the payload from the [Java Job Manager](https://github.com/mVeerasingam/BatterySimulator_JobManager), it generates a simulation
