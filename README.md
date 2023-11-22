@@ -15,3 +15,6 @@ The application should handle multiple simulation requests concurrently without 
 -   Model generated from param inputs: 'upper-voltage cut off', 'lower-voltage cut off', 'nominal cell capacity' and a fixed 'current'.
 -   Java Job Manager can send a post request to the microservice and that updates the payload for model generation and simulation.
 -   Battery Simulator sends payload back to job manager via post request.
+
+### Supporting Microservices
+[Battery Job Manager 🔋🔄](https://github.com/mVeerasingam/BatterySimulator_JobManager)
