@@ -1,0 +1,25 @@
+name: Update Issues
+
+on:
+  issues:
+    types:
+      - opened
+      - closed
+      - reopened
+
+jobs:
+  update-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Fetch and update issues
+        run: |
+          curl -sSL "https://api.github.com/repos/${{ github.repository }}/issues" > issues.json
+          echo "Last Updated: $(date)" > last_updated.txt
+          git add issues.json last_updated.txt
+          git commit -m "Update issues and last_updated [skip ci]"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

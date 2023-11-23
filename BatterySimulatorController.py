@@ -92,6 +92,7 @@ def simulate_battery(params, hours, id):
         voltage = solution['Battery voltage [V]'].entries
         current = solution['Current [A]'].entries
         dcap = solution['Discharge capacity [A.h]'].entries
+        temp = solution['Ambient temperature [K]'].entries
         combined_data = []
 
         # Formats is to the simulation updates over length of simulation time
@@ -100,7 +101,8 @@ def simulate_battery(params, hours, id):
                 "time": time_s[i],
                 "voltage": voltage[i],
                 "current": current[i],
-                "dcap": dcap[i]
+                "dcap": dcap[i],
+                "temp": temp[i]
             }
             combined_data.append(data_point)
 
@@ -166,6 +168,7 @@ def simulate():
             "Upper voltage cut-off [V]": data.get("upperVoltage", 4.2),
             "Lower voltage cut-off [V]": data.get("lowerVoltage", 2.5),
             "Nominal cell capacity [A.h]": data.get("nominalCell", 8.6),
+            "Ambient temperature [K]": data.get("temperature", 323.15),
             "Current function [A]": data.get("controlCurrent", 5),  # "Current-controlled" = fixed current
             # find a more safer to calc a better current or c-rate potentially
         }
