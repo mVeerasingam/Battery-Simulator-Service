@@ -134,12 +134,11 @@ def simulate():
             Lithium Ion Batteries have a typical nominal voltage of 3.6V ~ 3.7V.
             Nominal Voltage = Upper Voltage / Lower Volage.
             The solver solves relative to this range. keeping the upper voltage 4.2V and 
-            lower voltage ~2.5V - 3V produces no errors and accurate time solved simulations.
+            lower voltage ~2.5V - 3V produces no errors and accurate time sovled simulations.
 
             Current:
             "controlCurrent" is a fixed current when solving the ODE. When solving PyBaMM
             https://github.com/pybamm-team/PyBaMM/issues/124
-
             changing "controlCurrent" can cause the simulation to produce poor results if passing too high of a current.
             "controlCurrent" is designed to be a fixed current when solving the ODE.
             e.g.
@@ -149,17 +148,16 @@ def simulate():
                 "Nominal cell capacity [A.h]":  9, 
                 "Current function [A]":         8  
                 }) 
-
             Produces errors like:
             "At t = 549.166 and h = 3.20498e-14, the corrector convergence failed repeatedly or with |h| = hmin."
 
-            While this doesn't stop the simulation it can produce poor results for accurate simulations.
+            While this doesent stop the simulation it can produce poor results for accurate simulations.
 
             I found setting controlCurrent to 2 is a nice sweet spot.
             While I'm not entirley sure why, I suspect that.. 
             Similar to a 1C charge for a 2000mAh the battery would be 2000mA (or 2A)
 
-            I think having the user choose would be beneficial for unique results. Would need to give a prompt on the frontend
+            I think having the user choose would be benefiial for unique resuelts. Would need to give a prompt on the frontend
         '''
 
         custom_parameters = {
