@@ -9,20 +9,20 @@ Description:    A flask based microservice that simulates Lithium-Ion Battery mo
                 The application should handle multiple simulation requests concurrently without blocking.
 
 
-Features:       -   Currently, genereates a single cell Lithium Ion Battery Model, based off a LGM50 Cell's electrochemical properties.
+Features:       -   Currently, generates a single cell Lithium Ion Battery Model, based off a LGM50 Cell's electrochemical properties.
                 -   Model generated from param inputs: 'upper-voltage cut off', 'lower-voltage cut off', 'nominal cell capacity' and a fixed 'current'.
                 -   Java Job Manager can send a post request to the microservice and that updates the payload for model generation and simulation.
                 -   Battery Simulator sends payload back to job manager via post request.
 
 ToDo:
                 Testing and Validation:
-                -   Make tests to check if the payload has recieved/updated/sent to and from java respectivley.
+                -   Make tests to check if the payload has received/updated/sent to and from java respectively.
                 -   Test if code can handle multiple simulation requests concurrently without blocking.
                 -   Validate flask requests so that all parameters are required
 
                 Simulations:
                     ------------------------[Simulation Model Options]------------------------------------------------------
-                -   Option to simulate battereis at 0°/25°/75°. Default is 25°
+                -   Option to simulate batteries at 0°/25°/75°. Default is 25°
 
                 -   Option to simulate a discharge or charge of a battery. (Could just reverse the discharge? simple option)
 
@@ -31,11 +31,11 @@ ToDo:
 
                 -   [idea] With validation. Have the option to input either a nominal voltage or upper and lower voltage
                     as a customisable parameter. Lithium Ion's nominal voltage is ~ 3.6V to 3.7V.
-                    Nomimnal Voltage = Upper Voltage CutOff + Lower Voltage CutOff / 2.
-                    Most Li-On Battery datasheets show it's nominal voltage. Having the above suggestion is good UX
-                    Alternativley.
-                        A simpler option is to Let the user choose a nominal voltage option between 3.6V and 3.7V they wish
-                        to model off of. These options just  have the preset upper and lower voltages assigned to them.
+                    Nominal Voltage = Upper Voltage CutOff + Lower Voltage CutOff / 2.
+                    Most Li-On Battery datasheets show its nominal voltage. Having the above suggestion is good UX
+                    Alternatively:
+                        A simpler option is to let the user choose a nominal voltage option between 3.6V and 3.7V they wish
+                        to model off of. These options just have the preset upper and lower voltages assigned to them.
                         This saves us trying to calc new upper and lower voltages.
 
                     --------------------------[Simulation Features]--------------------------------------------------------
@@ -45,17 +45,17 @@ ToDo:
                     If a job is not running it tells this microservice to execute the next job (generate a new simulation)
 
                 -   This is a job manager function but relevant. The project DB should have premade real life battery cells like LGM50 or Samsung-inr18650-25r
-                    The simulator should be able to succesfully recieve these values and send it back without causing any issues.
+                    The simulator should be able to succesfully receive these values and send it back without causing any issues.
 
                     --------------------------------[Long-Term]------------------------------------------------------------
                 -   Once a model is made, look at making a definition that simulates that models drive cycle
-                    User could have option to simulate battery model and or make drive cycle
+                    User could have option to simulate battery model and/or make drive cycle
                     By solving with a changing current like: https://tinyurl.com/2prwzrrh
                     It would allow a drive cycle simulation (different from the current time solved simulation).
 
                 -   String based experiments
 
-                -   Try implementing LiionPack for lithium ion pack simulation
+                -   Try implementing LiIonPack for lithium ion pack simulation
 '''
 
 import threading
@@ -80,12 +80,12 @@ def simulate_battery(params, hours, id):
 
         # Electrochemical parameters are based off a 'LGM50' Cell. "Chen2020" is the experiment name the chemistry was referenced from
         custom_parameters = pybamm.ParameterValues("Chen2020")
-        custom_parameters.update(params)  # we can update the parameters with recieved argument "params"
+        custom_parameters.update(params)  # we can update the parameters with received argument "params"
 
         safe_sim = pybamm.Simulation(model, parameter_values=custom_parameters, solver=safe_solver)
 
-        seconds = hours * 60 * 60  # Pybamm solves in secnods, having the user input in hours would make more sense
-        solution = safe_sim.solve([0, seconds])  # solve  simulation from 0 seconds -> x ammount of seconds
+        seconds = hours * 60 * 60  # Pybamm solves in seconds, having the user input in hours would make more sense
+        solution = safe_sim.solve([0, seconds])  # solve simulation from 0 seconds -> x amount of seconds
 
         # contents of the payload sent to job manager.
         time_s = solution['Time [s]'].entries
@@ -134,7 +134,7 @@ def simulate():
             Lithium Ion Batteries have a typical nominal voltage of 3.6V ~ 3.7V.
             Nominal Voltage = Upper Voltage / Lower Volage.
             The solver solves relative to this range. keeping the upper voltage 4.2V and 
-            lower voltage ~2.5V - 3V produces no errors and accurate time sovled simulations.
+            lower voltage ~2.5V - 3V produces no errors and accurate time solved simulations.
 
             Current:
             "controlCurrent" is a fixed current when solving the ODE. When solving PyBaMM
@@ -153,13 +153,13 @@ def simulate():
             Produces errors like:
             "At t = 549.166 and h = 3.20498e-14, the corrector convergence failed repeatedly or with |h| = hmin."
 
-            While this doesent stop the simulation it can produce poor results for accurate simulations.
+            While this doesn't stop the simulation it can produce poor results for accurate simulations.
 
             I found setting controlCurrent to 2 is a nice sweet spot.
-            While i'm not entirley sure why, I suspect that.. 
+            While I'm not entirley sure why, I suspect that.. 
             Similar to a 1C charge for a 2000mAh the battery would be 2000mA (or 2A)
 
-            I think having the user choose would be benefiial for unique resuelts. Would need to give a prompt on the frontend
+            I think having the user choose would be beneficial for unique results. Would need to give a prompt on the frontend
         '''
 
         custom_parameters = {
@@ -170,15 +170,15 @@ def simulate():
             # find a more safer to calc a better current or c-rate potentially
         }
 
-        # by using threads we handle the simulations separately from the main  application thread.
+        # by using threads we handle the simulations separately from the main application thread.
         # goal is to handle multiple simulation requests concurrently without blocking.
         thread = threading.Thread(target=simulate_battery, args=(custom_parameters, hours, id))
         thread.start()
 
         sim = simulate_battery(custom_parameters, hours, id)
 
-        # Note. As of the moment jsonify returns sim. this is just to test if simulation values arent breaking
-        # [Down the line] Simulation should be able to be viewed/graphed on the webstie and prompted with the choice to save or try again
+        # Note. As of the moment jsonify returns sim. this is just to test if simulation values aren't breaking
+        # [Down the line] Simulation should be able to be viewed/graphed on the website and prompted with the choice to save or try again
         return jsonify({"jobStarted": True}, sim)
 
     except Exception as e:
