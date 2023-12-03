@@ -1,0 +1,5 @@
+Fask==3.0.0
+pybamm==23.9
+requests==2.31.0
+numpy==1.24.1
+pandas==2.0.3
