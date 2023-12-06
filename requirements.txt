@@ -1,0 +1,3 @@
+Flask==3.0.0
+pybamm==23.9
+requests==2.31.0

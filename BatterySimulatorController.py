@@ -66,7 +66,8 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 # url to send the data back to the Java Job Manager
-return_url = "http://127.0.0.1:8083/updateBatteryResults"
+return_url = "http://localhost:8083/updateBatteryResults"
+#return_url = "http://job-manager-service:8083/updateBatteryResults"
 
 
 def simulate_battery(params, hours, id):
@@ -184,4 +185,4 @@ def simulate():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8084)
+    app.run(host='0.0.0.0',port=8084,debug=True,threaded=True)
