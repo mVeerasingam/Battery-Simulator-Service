@@ -9,53 +9,10 @@ Description:    A flask based microservice that simulates Lithium-Ion Battery mo
                 The application should handle multiple simulation requests concurrently without blocking.
 
 
-Features:       -   Currently, generates a single cell Lithium Ion Battery Model, based off a LGM50 Cell's electrochemical properties.
+Features:       -   Generates a single cell Lithium Ion Battery Model, based off a LGM50 Cell's electrochemical properties.
                 -   Model generated from param inputs: 'upper-voltage cut off', 'lower-voltage cut off', 'nominal cell capacity' and a fixed 'current'.
                 -   Java Job Manager can send a post request to the microservice and that updates the payload for model generation and simulation.
                 -   Battery Simulator sends payload back to job manager via post request.
-
-ToDo:
-                Testing and Validation:
-                -   Make tests to check if the payload has received/updated/sent to and from java respectively.
-                -   Test if code can handle multiple simulation requests concurrently without blocking.
-                -   Validate flask requests so that all parameters are required
-
-                Simulations:
-                    ------------------------[Simulation Model Options]------------------------------------------------------
-                -   Option to simulate batteries at 0°/25°/75°. Default is 25°
-
-                -   Option to simulate a discharge or charge of a battery. (Could just reverse the discharge? simple option)
-
-                -   Option to simulate in different models ("BaseModel", "SPM", "DFN"etc...)
-                    Could display "Simulate Model 1/2 etc..." on website (no need for major detail).
-
-                -   [idea] With validation. Have the option to input either a nominal voltage or upper and lower voltage
-                    as a customisable parameter. Lithium Ion's nominal voltage is ~ 3.6V to 3.7V.
-                    Nominal Voltage = Upper Voltage CutOff + Lower Voltage CutOff / 2.
-                    Most Li-On Battery datasheets show its nominal voltage. Having the above suggestion is good UX
-                    Alternatively:
-                        A simpler option is to let the user choose a nominal voltage option between 3.6V and 3.7V they wish
-                        to model off of. These options just have the preset upper and lower voltages assigned to them.
-                        This saves us trying to calc new upper and lower voltages.
-
-                    --------------------------[Simulation Features]--------------------------------------------------------
-                -   Handle multiple simulation requests concurrently without blocking.
-                    Java Job Manager looks at the message queues sent from microservice 1.
-                    If a message says that a simulation job is already running, it waits before pulling from message queue.
-                    If a job is not running it tells this microservice to execute the next job (generate a new simulation)
-
-                -   This is a job manager function but relevant. The project DB should have premade real life battery cells like LGM50 or Samsung-inr18650-25r
-                    The simulator should be able to succesfully receive these values and send it back without causing any issues.
-
-                    --------------------------------[Long-Term]------------------------------------------------------------
-                -   Once a model is made, look at making a definition that simulates that models drive cycle
-                    User could have option to simulate battery model and/or make drive cycle
-                    By solving with a changing current like: https://tinyurl.com/2prwzrrh
-                    It would allow a drive cycle simulation (different from the current time solved simulation).
-
-                -   String based experiments
-
-                -   Try implementing LiIonPack for lithium ion pack simulation
 '''
 
 import threading
@@ -66,16 +23,17 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 # url to send the data back to the Java Job Manager
-#return_url = "http://localhost:8083/updateBatteryResults"
-return_url = "http://job-manager-service:8083/updateBatteryResults"
+return_url = "http://localhost:8083/updateBatteryResults"
+#return_url = "http://job-manager-service:8083/updateBatteryResults"
 
 
-def simulate_battery(params, hours, id):
+def simulate_battery(params, hours, id, result_holder):
     try:
-        # Create a Lithium Ion battery model with a DFN model, may look at having different models in the near future
+        # Create a Lithium Ion battery model with a DFN (doyle fuller newman) model
         model = pybamm.lithium_ion.DFN()
 
-        # Casadi safe solver may be best for solving ODE's for this specific project
+        # PyBaMM uses CasAdi, this is a tool for numerical optimization in general and optimal control
+        # Running in "safe" mode may be best for solving ODE's for this specific project
         safe_solver = pybamm.CasadiSolver(atol=1e-6, rtol=1e-6,
                                           mode="safe")  # perform step-and-check integration in global steps of size dt_max
 
@@ -111,14 +69,14 @@ def simulate_battery(params, hours, id):
             'result': combined_data
         })
 
-        return combined_data
+        result_holder["result"] = combined_data
 
     except pybamm.SolverError as e:
         return {"error": f"SolverError:\nVoltage cut-off values should be relative to 2.5V and 4.2V: {str(e)}"}
     except Exception as e:
         return {"error": f"Error: {str(e)}"}
 
-
+ 
 @app.route('/simulate', methods=['POST'])
 def simulate():
     try:
@@ -161,24 +119,28 @@ def simulate():
             I think having the user choose would be benefiial for unique resuelts. Would need to give a prompt on the frontend
         '''
 
+        # User inputs
         custom_parameters = {
             "Upper voltage cut-off [V]": data.get("upperVoltage", 4.2),
             "Lower voltage cut-off [V]": data.get("lowerVoltage", 2.5),
             "Nominal cell capacity [A.h]": data.get("nominalCell", 8.6),
             "Current function [A]": data.get("controlCurrent", 5),  # "Current-controlled" = fixed current
-            # find a more safer to calc a better current or c-rate potentially
         }
 
-        # by using threads we handle the simulations separately from the main application thread.
-        # goal is to handle multiple simulation requests concurrently without blocking.
-        thread = threading.Thread(target=simulate_battery, args=(custom_parameters, hours, id))
-        thread.start()
+        # mutable object to store the result
+        result_holder = {"result": None}
 
-        sim = simulate_battery(custom_parameters, hours, id)
+        # by using threads we handle the simulations separately from the main application thread.
+        # goal is to handle multiple simulation requests concur rently without blocking.
+        thread = threading.Thread(target=simulate_battery, args=(custom_parameters, hours, id, result_holder))
+        thread.start()  
+        thread.join()
+        # sim = simulate_battery(custom_parameters, hours, id)
+        sim_results = result_holder["result"]
 
         # Note. As of the moment jsonify returns sim. this is just to test if simulation values aren't breaking
         # [Down the line] Simulation should be able to be viewed/graphed on the website and prompted with the choice to save or try again
-        return jsonify({"jobStarted": True}, sim)
+        return jsonify({"jobStarted": True, "simulationResults": sim_results})
 
     except Exception as e:
         return jsonify(error=str(e))

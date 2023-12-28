@@ -1,14 +1,13 @@
-FROM python:3.11-alpine
+FROM python:3.11-slim
+
+RUN pip install --upgrade pip
+
+# We copy just the requirements.txt first to leverage Docker cache
+COPY ./requirements.txt /app/requirements.txt
 
 WORKDIR /app
 
-COPY ./requirements.txt /app
-
-RUN apk --no-cache add gcc musl-dev \
-    && pip install --upgrade pip \
-    && pip install -r requirements.txt \
-    && apk del gcc musl-dev \
-    && rm -rf /var/cache/apk/*
+RUN pip install -r requirements.txt
 
 COPY . /app
 
