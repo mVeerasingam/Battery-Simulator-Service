@@ -23,16 +23,17 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 # url to send the data back to the Java Job Manager
-#return_url = "http://localhost:8083/updateBatteryResults"
-return_url = "http://job-manager-service:8083/updateBatteryResults"
+return_url = "http://localhost:8083/updateBatteryResults"
+#return_url = "http://job-manager-service:8083/updateBatteryResults"
 
 
-def simulate_battery(params, hours, id):
+def simulate_battery(params, hours, id, result_holder):
     try:
-        # Create a Lithium Ion battery model with a DFN model, may look at having different models in the near future
+        # Create a Lithium Ion battery model with a DFN (doyle fuller newman) model
         model = pybamm.lithium_ion.DFN()
 
-        # Casadi safe solver may be best for solving ODE's for this specific project
+        # PyBaMM uses CasAdi, this is a tool for numerical optimization in general and optimal control
+        # Running in "safe" mode may be best for solving ODE's for this specific project
         safe_solver = pybamm.CasadiSolver(atol=1e-6, rtol=1e-6,
                                           mode="safe")  # perform step-and-check integration in global steps of size dt_max
 
@@ -68,14 +69,14 @@ def simulate_battery(params, hours, id):
             'result': combined_data
         })
 
-        return combined_data
+        result_holder["result"] = combined_data
 
     except pybamm.SolverError as e:
         return {"error": f"SolverError:\nVoltage cut-off values should be relative to 2.5V and 4.2V: {str(e)}"}
     except Exception as e:
         return {"error": f"Error: {str(e)}"}
 
-
+ 
 @app.route('/simulate', methods=['POST'])
 def simulate():
     try:
@@ -118,24 +119,28 @@ def simulate():
             I think having the user choose would be benefiial for unique resuelts. Would need to give a prompt on the frontend
         '''
 
+        # User inputs
         custom_parameters = {
             "Upper voltage cut-off [V]": data.get("upperVoltage", 4.2),
             "Lower voltage cut-off [V]": data.get("lowerVoltage", 2.5),
             "Nominal cell capacity [A.h]": data.get("nominalCell", 8.6),
             "Current function [A]": data.get("controlCurrent", 5),  # "Current-controlled" = fixed current
-            # find a more safer to calc a better current or c-rate potentially
         }
 
-        # by using threads we handle the simulations separately from the main application thread.
-        # goal is to handle multiple simulation requests concurrently without blocking.
-        thread = threading.Thread(target=simulate_battery, args=(custom_parameters, hours, id))
-        thread.start()
+        # mutable object to store the result
+        result_holder = {"result": None}
 
-        sim = simulate_battery(custom_parameters, hours, id)
+        # by using threads we handle the simulations separately from the main application thread.
+        # goal is to handle multiple simulation requests concur rently without blocking.
+        thread = threading.Thread(target=simulate_battery, args=(custom_parameters, hours, id, result_holder))
+        thread.start()  
+        thread.join()
+        # sim = simulate_battery(custom_parameters, hours, id)
+        sim_results = result_holder["result"]
 
         # Note. As of the moment jsonify returns sim. this is just to test if simulation values aren't breaking
         # [Down the line] Simulation should be able to be viewed/graphed on the website and prompted with the choice to save or try again
-        return jsonify({"jobStarted": True}, sim)
+        return jsonify({"jobStarted": True, "simulationResults": sim_results})
 
     except Exception as e:
         return jsonify(error=str(e))
