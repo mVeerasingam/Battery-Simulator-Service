@@ -138,10 +138,14 @@ def simulate():
         # sim = simulate_battery(custom_parameters, hours, id)
         sim_results = result_holder["result"]
 
-        # Note. As of the moment jsonify returns sim. this is just to test if simulation values aren't breaking
-        # [Down the line] Simulation should be able to be viewed/graphed on the website and prompted with the choice to save or try again
-        return jsonify({"jobStarted": True, "simulationResults": sim_results})
+        # Check if object has required contents for a simulation
+        if sim_results is not None:
+            return jsonify({"jobStarted": True, "simulationResults": sim_results})
+        else:
+            return jsonify({"jobStarted": False, "simulationResults": sim_results})
 
+    except pybamm.SolverError as e:
+        return jsonify({"jobStarted": False, "error": f"SolverError: Voltage cut-off values should be relative to 2.5V and 4.2V: {str(e)}"})
     except Exception as e:
         return jsonify(error=str(e))
 
