@@ -23,7 +23,7 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 # url to send the data back to the Java Job Manager
-return_url = "http://localhost:8083/updateBatteryResults"
+return_url = "http://localhost:8083/simulateCell"
 #return_url = "http://job-manager-service:8083/updateBatteryResults"
 
 
