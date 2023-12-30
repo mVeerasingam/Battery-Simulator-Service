@@ -18,11 +18,12 @@ Features:       -   Generates a single cell Lithium Ion Battery Model, based off
 import threading
 import requests
 import pybamm
-from flask import Flask, request, jsonify
+from flask import Blueprint, request, jsonify
 
-app = Flask(__name__)
+simulateCell_bp = Blueprint("cellSimulation", __name__)
 
-# url to send the data back to the Java Job Manager
+# url to send the d
+# ata back to the Java Job Manager
 return_url = "http://localhost:8083/simulateCell"
 #return_url = "http://job-manager-service:8083/updateBatteryResults"
 
@@ -77,7 +78,7 @@ def simulate_battery(params, hours, id, result_holder):
         return {"error": f"Error: {str(e)}"}
 
  
-@app.route('/simulate', methods=['POST'])
+@simulateCell_bp.route('/simulate', methods=['POST'])
 def simulate():
     try:
 
@@ -148,7 +149,3 @@ def simulate():
         return jsonify({"jobStarted": False, "error": f"SolverError: Voltage cut-off values should be relative to 2.5V and 4.2V: {str(e)}"})
     except Exception as e:
         return jsonify(error=str(e))
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0',port=8084,debug=True,threaded=True)
