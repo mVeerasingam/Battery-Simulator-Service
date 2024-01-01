@@ -5,8 +5,8 @@ from flask import Blueprint, request, jsonify
 
 simulateCell_bp = Blueprint("cellSimulation", __name__)
 
-return_url = "http://localhost:8083/simulateCell"
-#return_url = "http://job-manager-service:8083/simulateCell"
+#return_url = "http://localhost:8083/simulateCell"
+return_url = "http://job-manager-service:8083/simulateCell"
 
 
 def simulate_battery(params, hours, id, result_holder):

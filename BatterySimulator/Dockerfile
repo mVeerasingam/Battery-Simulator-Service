@@ -13,4 +13,4 @@ COPY . /app
 
 EXPOSE 8084
 
-CMD ["python", "./BatterySimulatorController.py"]
+CMD ["python", "./Main.py"]

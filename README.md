@@ -20,3 +20,31 @@ The application should handle multiple simulation requests concurrently without 
 
 ### Supporting Microservices
 [Battery Job Manager 🔋🔄](https://github.com/mVeerasingam/BatterySimulator_JobManager)
+
+```
+Battery-Simulator-Service
+├─ .idea
+│  ├─ batterySimulator.iml
+│  ├─ inspectionProfiles
+│  │  └─ profiles_settings.xml
+│  ├─ misc.xml
+│  ├─ modules.xml
+│  └─ vcs.xml
+├─ batterySim.png
+├─ BatterySimulator
+│  ├─ Blueprints
+│  │  └─ Simulations
+│  │     ├─ Simulation_DriveCycle.py
+│  │     ├─ Simulation_SingleCell.py
+│  │     └─ __pycache__
+│  │        ├─ Simulation_DriveCycle.cpython-311.pyc
+│  │        └─ Simulation_SingleCell.cpython-311.pyc
+│  ├─ Dockerfile
+│  ├─ DriveCycle_Data
+│  │  └─ US06.csv
+│  ├─ Main.py
+│  └─ requirements.txt
+├─ README.md
+└─ ToDo.txt
+
+```
