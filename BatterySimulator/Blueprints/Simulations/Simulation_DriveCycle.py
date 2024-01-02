@@ -6,8 +6,8 @@ from flask import Blueprint, request, jsonify
 
 simulateDriveCycle_bp = Blueprint("driveCycleSimulation", __name__)
 
-#return_url = "http://localhost:8083/simulateDriveCycle"
-return_url = "http://job-manager-service:8083/simulateDriveCycle"
+return_url = "http://localhost:8083/simulateDriveCycle"
+#return_url = "http://job-manager-service:8083/simulateDriveCycle"
 
 def simulate(id, result_holder, params):
     model = pybamm.lithium_ion.DFN()
