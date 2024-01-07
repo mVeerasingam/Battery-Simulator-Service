@@ -57,8 +57,8 @@ def simulate_driveCycle():
 
         id = data.get('id')
         
-        # drive_cycle = pd.read_csv(r"DriveCycle_Data/US06.csv", comment="#", header=None).to_numpy()
-        drive_cycle = pd.read_csv(r"BatterySimulator\DriveCycle_Data\US06.csv", comment="#", header=None).to_numpy()
+        drive_cycle = pd.read_csv(r"DriveCycle_Data/US06.csv", comment="#", header=None).to_numpy()
+        #drive_cycle = pd.read_csv(r"BatterySimulator\DriveCycle_Data\US06.csv", comment="#", header=None).to_numpy()
         current_interpolant = pybamm.Interpolant(drive_cycle[:, 0], drive_cycle[:, 1], pybamm.t)
 
         # User inputs
@@ -77,9 +77,9 @@ def simulate_driveCycle():
 
         sim_results = result_holder["result"]
         if sim_results is not None:
-            return jsonify({"jobStarted": True, "simulationResults": sim_results})
+            return jsonify({"jobStarted": True, "simulationType": "driveCycle", "simulationResults": sim_results})
         else:
-            return jsonify({"jobStarted": False, "simulationResults": sim_results})
+            return jsonify({"jobStarted": False, "simulationType": "driveCycle", "simulationResults": sim_results})
         
     except pybamm.SolverError as e:
         return jsonify({"jobStarted": False, "error": f"SolverError: Voltage cut-off values should be relative to 2.5V and 4.2V: {str(e)}"})
