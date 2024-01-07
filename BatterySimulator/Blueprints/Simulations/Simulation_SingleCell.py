@@ -122,9 +122,9 @@ def simulate():
 
         # Check if object has required contents for a simulation
         if sim_results is not None:
-            return jsonify({"jobStarted": True, "simulationResults": sim_results})
+            return jsonify({"jobStarted": True, "simulationType": "cell", "simulationResults": sim_results})
         else:
-            return jsonify({"jobStarted": False, "simulationResults": sim_results})
+            return jsonify({"jobStarted": False, "simulationType": "cell", "simulationResults": sim_results})
 
     except pybamm.SolverError as e:
         return jsonify({"jobStarted": False, "error": f"SolverError: Voltage cut-off values should be relative to 2.5V and 4.2V: {str(e)}"})
