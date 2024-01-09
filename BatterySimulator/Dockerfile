@@ -1,16 +1,17 @@
 FROM python:3.11-slim
 
-RUN pip install --upgrade pip
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-# We copy just the requirements.txt first to leverage Docker cache
 COPY ./requirements.txt /app/requirements.txt
-
 WORKDIR /app
-
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 COPY . /app
 
 EXPOSE 8084
 
+# Command to run the application
 CMD ["python", "./Main.py"]
