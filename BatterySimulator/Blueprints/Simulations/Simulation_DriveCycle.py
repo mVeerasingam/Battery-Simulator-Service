@@ -6,8 +6,11 @@ from flask import Blueprint, request, jsonify
 
 simulateDriveCycle_bp = Blueprint("driveCycleSimulation", __name__)
 
-return_url = "http://localhost:8083/simulateDriveCycle"
-#return_url = "http://job-manager-service:8083/simulateDriveCycle"
+# Local host
+#return_url = "http://localhost:8083/simulateDriveCycle"
+
+# Docker
+return_url = "http://job-manager-service:8083/simulateDriveCycle"
 
 def simulate(id, result_holder, params):
     model = pybamm.lithium_ion.DFN()
@@ -57,7 +60,10 @@ def simulate_driveCycle():
 
         id = data.get('id')
         
+        # Docker
         drive_cycle = pd.read_csv(r"DriveCycle_Data/US06.csv", comment="#", header=None).to_numpy()
+
+        #Local host
         #drive_cycle = pd.read_csv(r"BatterySimulator\DriveCycle_Data\US06.csv", comment="#", header=None).to_numpy()
         current_interpolant = pybamm.Interpolant(drive_cycle[:, 0], drive_cycle[:, 1], pybamm.t)
 
