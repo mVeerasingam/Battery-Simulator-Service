@@ -19,7 +19,7 @@ The application should handle multiple simulation requests concurrently without 
 ![Battery Simulator](https://github.com/mVeerasingam/Battery-Simulator-Service/raw/main/batterySim.png)
 
 ### Supporting Microservices
-[Battery Job Manager 🔋🔄](https://github.com/mVeerasingam/BatterySimulator_JobManager)
+[Battery Job Manager 🔋🔄](https://github.com/mVeerasingam/Battery_Sim_CICD.draw.io)
 
 ```
 Battery-Simulator-Service
