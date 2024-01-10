@@ -77,3 +77,6 @@ Battery-Simulator-Service
 └─ ToDo.txt
 
 ```
+- [Battery Simulator Job Manager](https://github.com/mVeerasingam/BatterySimulator-JobManager)
+- [Battery Simulator DB Operations](https://github.com/mVeerasingam/BatterySimulator_DatabaseOperations)
+- [Battery Simulator Queue Service](https://github.com/mVeerasingam/BatterySimulator-QueueService/tree/master)
